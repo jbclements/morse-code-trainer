@@ -6,12 +6,12 @@
          "morse-code-sounds.rkt")
 (require (only-in rsound play))
 
-(define rand-words
-  (for/list ([i 10]) (list-ref wordlist (random (length wordlist)))))
-
 ;; DONE AT 15 WPM (with 20 WPM char speed):
 ;; ET AT AE AET NT EN AN AENT AI EI IN IT AEINT
 (define charset (list #\a #\e #\i #\n #\t))
+
+(define (random-code-group charset)
+  (list->string (for/list ([i 5]) (list-ref charset (random (length charset))))))
 
 (define rand-code-groups (for/list ([i 10]) (random-code-group charset)))
 
@@ -20,7 +20,7 @@
 
 (define text (apply string-append (add-between words " ")))
 
-(define the-sound (word-list->sound words))
+(define the-sound (word-list->sound words 20 15))
 
 (play the-sound)
 
