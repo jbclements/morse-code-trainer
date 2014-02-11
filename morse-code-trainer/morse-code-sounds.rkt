@@ -1,5 +1,8 @@
 #lang racket
 
+;; Copyright 2013 John Clements (clements@racket-lang.org)
+;; Code licensed under the Mozilla Public License 2.0
+
 ;; this file contains functions to convert text into sounds
 
 (require rsound
@@ -47,9 +50,9 @@
   (define (u units) (* unit-frames units))
   (define (su units) (* space-unit-frames units))
   
-  (define pitch 880)
+  (define pitch 770)
   
-  (define (toney units) (make-tone pitch 0.2 (u units)))
+  (define (toney units) (make-tone pitch 0.15 (u units)))
   
   (define dit (toney 1))
   (define dah (toney 3))

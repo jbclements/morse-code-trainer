@@ -1,0 +1,4 @@
+The NGSL (New General Service List) of common words is licensed under a
+Creative Commons Attribution 3.0 Unported License.
+
+The other work in the repository is licensed under the Mozilla Public License, version 2.0
