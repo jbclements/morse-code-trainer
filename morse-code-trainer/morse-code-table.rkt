@@ -1,5 +1,7 @@
 #lang typed/racket
 
+;; Copyright 2014 John Clements, except the portion that comes from wikipedia!
+
 (provide char-table)
 
 (define wikipedia-text
@@ -61,9 +63,11 @@
 #
 )
 
+;; the lines of the wikipedia text
 (: lines (Listof String))
 (define lines (regexp-split #px"\n" wikipedia-text))
 
+;; replace some unicode chars with ascii ones in the wikipedia patterns
 (: clean-pattern (String -> String))
 (define (clean-pattern pat)
   (regexp-replace*
@@ -74,6 +78,7 @@
     "-")
    "."))
 
+;; parse the wikipedia text into a table mapping characters to their morse code representations
 (: char-table (HashTable Char String))
 (define char-table
 (make-hash

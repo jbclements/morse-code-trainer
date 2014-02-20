@@ -1,6 +1,6 @@
 #lang racket
 
-;; Copyright 2013 John Clements (clements@racket-lang.org)
+;; Copyright 2014 John Clements (clements@racket-lang.org)
 ;; Code licensed under the Mozilla Public License 2.0
 
 
@@ -11,8 +11,8 @@
 (require (only-in rsound play))
 
 ;; DONE AT 15 WPM (with 20 WPM char speed):
-;; ET AT AE AET NT EN AN AENT AI EI IN IT AEINT 
-(define charset (list #\n #\o #\t) #;(list #\a #\e #\i #\n #\o #\t))
+;; ET AT AE AET AENT AEINT AEINOT AERT
+(define charset (list #\r #\a #\e #\n #\t) #;(list #\a #\e #\i #\n #\o #\t))
 
 (define (random-code-group charset)
   (list->string (for/list ([i 5]) (list-ref charset (random (length charset))))))
