@@ -10,41 +10,45 @@
          "morse-code-sounds.rkt")
 (require (only-in rsound play))
 
+(define CHAR-WPM 20)
+(define EFFECTIVE-WPM 15)
+(define LETTERS-IN-GROUP 5)
+(define GROUPS 10)
+
 ;; DONE AT 15 WPM (with 20 WPM char speed):
-;; ET AT AE AET AENT AEINT AEINOT AERT
-(define charset (list #\r #\a #\e #\n #\t) #;(list #\a #\e #\i #\n #\o #\t))
+;; ET AT AE AET AENT AEINT AEINOT AENRT
+(define CHARSET (string->list "raeinot") #;(list #\a #\e #\i #\n #\o #\t))
 
+;; generate a sequence of a given length chosen from the letters in the charset
 (define (random-code-group charset)
-  (list->string (for/list ([i 5]) (list-ref charset (random (length charset))))))
+  (list->string (for/list ([i LETTERS-IN-GROUP]) (list-ref charset (random (length charset))))))
 
-(define rand-code-groups (for/list ([i 10]) (random-code-group charset)))
+;; generate the desired number of groups
+(define rand-code-groups (for/list ([i GROUPS]) (random-code-group CHARSET)))
 
-;; chose either rand-code-groups or rand-words:
-(define words #;rand-words rand-code-groups)
+;; play the sound
+(play (word-list->sound rand-code-groups CHAR-WPM EFFECTIVE-WPM))
 
-(define text (apply string-append (add-between words " ")))
+;; generate the text that the student should type in:
+(define correct-text (apply string-append (add-between rand-code-groups " ")))
 
-(define the-sound (word-list->sound words 20 15))
+(define user-input (read-line))
 
-(play the-sound)
-
-(define user-input
-  (read-line))
-
-(define result
+;; a string showing which characters were wrong:
+(define error-chars
   (apply
    string
    (for/list ([i (in-string user-input)]
-              [j (in-string text)])
+              [j (in-string correct-text)])
      (cond [(eq? i j) #\space]
            [else #\X]))))
-(list
- user-input
- text
- result
- (string-levenshtein user-input text)
- )
 
-
-
-;(play )
+(printf "
+typed:   ~s
+correct: ~s
+errors:  ~s
+levenshtein (edit) distance: ~s "
+        user-input
+        correct-text
+        error-chars
+        (string-levenshtein user-input correct-text))
