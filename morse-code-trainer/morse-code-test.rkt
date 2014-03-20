@@ -16,8 +16,8 @@
 (define GROUPS 10)
 
 ;; DONE AT 15 WPM (with 20 WPM char speed):
-;; ET AT AE AET AENT AEINT AEINOT AENRT
-(define CHARSET (string->list "raeinot") #;(list #\a #\e #\i #\n #\o #\t))
+;; ET AT AE AET AENT AEINT AEINOT AEINORT AEIS
+(define CHARSET (string->list "aeinorst") )
 
 ;; generate a sequence of a given length chosen from the letters in the charset
 (define (random-code-group charset)
