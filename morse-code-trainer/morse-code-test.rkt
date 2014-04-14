@@ -7,6 +7,7 @@
 ;; play a set of ten code groups, read keyboard input and report a score.
 
 (require levenshtein
+         math/distributions
          "morse-code-sounds.rkt")
 (require (only-in rsound play))
 
@@ -16,15 +17,24 @@
 (define GROUPS 10)
 
 ;; DONE AT 15 WPM (with 20 WPM char speed):
-;; ET AT AE AET AENT AEINT AEINOT AEINORT AEIS
-(define CHARSET (string->list "aeinorst") )
+;; ET AET AENT AEINT AEINOT AEINORT AEINORST TDSAIR
+(define OLDCHARS (string->list "aeinorst"))
+(define NEWCHARS (string->list "d"))
+
+(define letter-distribution
+  (discrete-dist (append OLDCHARS NEWCHARS)
+                 (vector-append
+                  (make-vector (length OLDCHARS) 1.0)
+                  (make-vector (length NEWCHARS) 5.0))))
+
 
 ;; generate a sequence of a given length chosen from the letters in the charset
-(define (random-code-group charset)
-  (list->string (for/list ([i LETTERS-IN-GROUP]) (list-ref charset (random (length charset))))))
+(define (random-code-group)
+  (list->string (for/list ([i LETTERS-IN-GROUP]) 
+                  (sample letter-distribution))))
 
 ;; generate the desired number of groups
-(define rand-code-groups (for/list ([i GROUPS]) (random-code-group CHARSET)))
+(define rand-code-groups (for/list ([i GROUPS]) (random-code-group)))
 
 ;; play the sound
 (play (word-list->sound rand-code-groups CHAR-WPM EFFECTIVE-WPM))
