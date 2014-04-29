@@ -15,7 +15,7 @@
 
 (define-runtime-path HERE ".")
 
-(define CHAR-WPM 20)
+(define CHAR-WPM 25)
 (define EFFECTIVE-WPM 15)
 (define LETTERS-IN-GROUP 5)
 (define GROUPS 10)
@@ -54,15 +54,12 @@
 
 
 (define (random-code-group-2)
-  (let loop ([i LETTERS-IN-GROUP]
+  (list->string
+   (let loop ([i LETTERS-IN-GROUP]
              [ch (sample letter-distribution)])
     (cond [(= i 0) empty]
-          [else (cons ch (loop (sub1 i) (sample (hash-ref follow-hash ch))))])))
+          [else (cons ch (loop (sub1 i) (sample (hash-ref follow-hash ch))))]))))
 
-(random-code-group-2)
-(random-code-group-2)
-(random-code-group-2)
-(random-code-group-2)
 
 ;; generate a sequence of a given length chosen from the letters in the charset
 (define (random-code-group)
@@ -70,9 +67,8 @@
                   (sample letter-distribution))))
 
 ;; generate the desired number of groups
-(define rand-code-groups (for/list ([i GROUPS]) (random-code-group)))
+(define rand-code-groups (for/list ([i GROUPS]) (random-code-group-2)))
 
-#;(
 ;; play the sound
 (play (word-list->sound rand-code-groups CHAR-WPM EFFECTIVE-WPM))
 
@@ -98,4 +94,4 @@ levenshtein (edit) distance: ~s "
         user-input
         correct-text
         error-chars
-        (string-levenshtein user-input correct-text)))
+        (string-levenshtein user-input correct-text))
