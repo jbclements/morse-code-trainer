@@ -15,44 +15,63 @@
 
 (define-runtime-path HERE ".")
 
-(define CHAR-WPM 25)
+(define CHAR-WPM 22)
 (define EFFECTIVE-WPM 15)
 (define LETTERS-IN-GROUP 5)
 (define GROUPS 10)
 
 ;; DONE AT 15 WPM (with 20 WPM char speed):
 ;; ET AET AENT AEINT AEINOT AEINORT AEINORST ADEINORST ADEHINORST
-(define OLDCHARS (string->list "aeinorst"))
-(define NEWCHARS (string->list "hd"))
+(define OLDCHARS (string->list "adehinorst"))
+(define NEWCHARS (string->list "l"))
 
 (define ALLCHARS (append OLDCHARS NEWCHARS))
 
 (define letter-distribution
   (discrete-dist ALLCHARS
                  (vector-append
-                  (make-vector (length OLDCHARS) 1.0)
-                  (make-vector (length NEWCHARS) 1.0))))
+                  (make-vector (length OLDCHARS) 0)
+                  (make-vector (length NEWCHARS) 80))))
 
+(define USE-MARKOV-LIKELIHOOD 0.5)
 
 (define markov-chain (file->value (build-path HERE "dickens-markov-chain.rktd")))
 
 (define (transpose lol)
   (apply map list lol))
 
-(define (reduce-distribution char)
-  (apply
-   discrete-dist
-   (transpose
+;; reduce a distribution to only a subset of elements.
+;; return "no-chars-in-distribution" if empty
+(define (reduce-distribution char dist)
+  (define remaining-elements
     (for/list ([v (second (hash-ref markov-chain char))]
                [p (third (hash-ref markov-chain char))]
                #:when (member v ALLCHARS))
-      (list v p)))))
+      (list v p)))
+  (cond [(empty? remaining-elements) "no-chars-in-distribution"]
+        [else (apply discrete-dist (transpose remaining-elements))]))
 
+;; a hash mapping characters to the distributions of
+;; their following letters RESTRICTED to elements of ALLCHARS.
 (define follow-hash
-  (for/hash ([char ALLCHARS])
-    (values char (reduce-distribution char))))
+  (for/hash ([(char dist) (in-hash markov-chain)])
+    (values char (reduce-distribution char dist))))
 
+;; generate a random code group; use the markov chain 
+;; distribution with likelihood USE-MARKOV-LIKELIHOOD
+(define (random-code-group-3)
+  (list->string
+   (let loop ([i LETTERS-IN-GROUP]
+              [prev-char #\space])
+     (cond [(= i 0) empty]
+           [else (define distribution 
+                   (cond [(< (random) USE-MARKOV-LIKELIHOOD)
+                          (hash-ref follow-hash prev-char)]
+                         [else letter-distribution]))
+                 (define next-char (sample distribution))
+                 (cons next-char (loop (sub1 i) next-char))]))))
 
+;; generate a random code group using the letter-distribution
 (define (random-code-group-2)
   (list->string
    (let loop ([i LETTERS-IN-GROUP]
@@ -67,7 +86,7 @@
                   (sample letter-distribution))))
 
 ;; generate the desired number of groups
-(define rand-code-groups (for/list ([i GROUPS]) (random-code-group-2)))
+(define rand-code-groups (for/list ([i GROUPS]) (random-code-group-3)))
 
 ;; play the sound
 (play (word-list->sound rand-code-groups CHAR-WPM EFFECTIVE-WPM))
