@@ -22,8 +22,9 @@
 
 ;; DONE AT 15 WPM (with 20 WPM char speed):
 ;; ET AET AENT AEINT AEINOT AEINORT AEINORST ADEINORST ADEHINORST
-(define OLDCHARS (string->list "adehinorst"))
-(define NEWCHARS (string->list "l"))
+(define OLDCHARS (string->list ""
+                               #;"adehinorst"))
+(define NEWCHARS (string->list "et"))
 
 (define ALLCHARS (append OLDCHARS NEWCHARS))
 

@@ -8,7 +8,7 @@
 
 (require/typed rsound 
                [#:opaque Sound rsound?]
-               [play (Sound -> String)])
+               [andplay (All (A) (Sound A -> A))])
 
 (require/typed "morse-code-sounds.rkt"
                [word-list->sound 
@@ -61,7 +61,7 @@
 
 (define the-sound (word-list->sound words HIGH-WPM HIGH-WPM))
 
-(play the-sound)
+(andplay the-sound #f)
 
 (: user-input String)
 (define user-input
