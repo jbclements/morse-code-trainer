@@ -10,6 +10,11 @@
 
 (provide (all-defined-out))
 
+(define (word-list->sound word-list WPM WPM-effective)
+  (define sound-bundle (make-sound-bundle WPM WPM-effective))
+  (rs-append* (add-between (map (word->sound sound-bundle) word-list)
+                           (sound-bundle-word-gap sound-bundle))))
+
 (define (s sec) (round (* sec 44100)))
 
 ;; map a character to a dit-dah string
@@ -20,9 +25,7 @@
     [str str]))
 
 
-(module+ test
-  (require rackunit)
-  (check-equal? (char->dit-dah-string #\A) ".-"))
+
 
 ;; The article SO YOU WANT TO LEARN MORSE CODE, by David G. Finley, suggests
 ;; characters at 20 WPM, with a bit of space-padding to 15 WPM overall.
@@ -97,8 +100,12 @@
                      (map char->dit-dah-string (string->list word)))
                 (sound-bundle-inter-gap sound-bundle))))
 
-;; check that the extra spacing worked right
 (module+ test
+  
+  (require rackunit)
+  (check-equal? (char->dit-dah-string #\A) ".-")
+
+  ;; check that the extra spacing worked right
   (check-=
    (rs-frames (rs-append ((word->sound default-sound-bundle) "paris")
                          (sound-bundle-word-gap default-sound-bundle)))
@@ -106,9 +113,7 @@
    ;; we can tolerate 20 frames of error per word.
    20))
 
-(define (word-list->sound word-list WPM WPM-effective)
-  (define sound-bundle (make-sound-bundle WPM WPM-effective))
-  (rs-append* (add-between (map (word->sound sound-bundle) word-list)
-                           (sound-bundle-word-gap sound-bundle))))
+
+
 
 
